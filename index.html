@@ -37,12 +37,12 @@
 			var camera, scene, raycaster, renderer;
 			var effect, controls;
 			var room;
-			var isMouseDown = false;
-			var crosshair;
 			var p = [];
 			for (var j = 0; j < 1000; j++) {
 				p.push(new THREE.Vector2(Math.random()*80, Math.random()*80));
 			}
+			var particle;
+			var blasted;
 			var particles = [];
 			var velocityx = [];
 			var velocityy = [];
@@ -68,18 +68,8 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10000 );
 				camera.position.set(39, 200, 10);
 				scene.add( camera );
-				crosshair = new THREE.Mesh(
-					new THREE.RingGeometry( 0.02, 0.04, 32 ),
-					new THREE.MeshBasicMaterial( {
-						color: 0xffffff,
-						opacity: 0.5,
-						transparent: true
-					} )
-				);
-				crosshair.position.z = - 2;
-				camera.add( crosshair );
 
-				// trying to make terrain=================================================================================================================
+				// creating terrain=================================================================================================================
 				planegeometry = new THREE.PlaneGeometry(2000, 2000, 72, 72);
 				planegeometry.rotateX( - Math.PI / 2 );
 
@@ -109,7 +99,6 @@
 				terrain = new THREE.Mesh(planegeometry, planematerial);
 				terrain.position.x = 20;
 				scene.add(terrain);
-				var geometry = new THREE.SphereGeometry( 3, 32, 32 );
 
 				var light = new THREE.PointLight(  0xffffff, 1.4 );
 				light.position.set( 50, 150, -50 );
@@ -134,18 +123,13 @@
 						} );
 					document.body.appendChild( WEBVR.getButton( effect ) );
 				}
-				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
-				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
-				renderer.domElement.addEventListener( 'touchstart', onMouseDown, false );
-				renderer.domElement.addEventListener( 'touchend', onMouseUp, false );
 				//
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
 
 			// Perlin Noise Function Implementing ================================================================================================================================
-			function perlinNoise(x, y) { // double x and y as parameter inputs
-				// which unit square? still confused, ASK
-				var unitx = Math.floor(x); //(int)Math.floor(x) & 255;
+			function perlinNoise(x, y) {
+				var unitx = Math.floor(x);
 				var unity = Math.floor(y);
 
 				var width = 1000;
@@ -173,10 +157,9 @@
 			//===================================================================================================================================================================================
 
 			//Tick function=======================================================================================================================================================================
-			var particle;
 			function tick() {
 				if (Math.random() < 0.07) {
-					particle = new THREE.Mesh( new THREE.SphereGeometry( 2, 16, 16 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffff00, shininess: 100} ));
+					particle = new THREE.Mesh( new THREE.SphereGeometry( 2, 16, 16 ), new THREE.MeshPhongMaterial( { color: (Math.random() * 0xffff00+0xffffff)/2, shininess: 100} ));
 					particle.position.x = Math.random() * 2000 - 1000;
 					particle.position.y = 50;
 					particle.position.z = Math.random() * 2000 - 1000;
@@ -184,14 +167,14 @@
 					velocityx.push(0);
 					velocityy.push(7 - Math.random()/5);
 					velocityz.push(0);
-					lifetimes.push(160-Math.random());
+					lifetimes.push(160-Math.random()*10);
 					firsttime.push(1);
 					scene.add(particle);
 				}
 				for (var i = 0; i < particles.length; i++) {
 					if (lifetimes[i] <= 0) {
 						if (firsttime[i] == 1) {
-							blast(particles[i].position.x, particles[i].position.y, particles[i].position.z);
+							blast(particles[i].position.x, particles[i].position.y+velocityy[i], particles[i].position.z);
 						}
 						scene.remove(particles[i]);
 						particles.splice(i, 1);
@@ -209,36 +192,27 @@
 					}
 				}
 			}
-
 			//===================================================================================================================================================================================
-			var blasted
+
 			//blast function=====================================================================================================================================================================
 			function blast(x, y, z) {
-				for (var i = 0; i < 10; i++) {
-					blasted = new THREE.Mesh( new THREE.SphereGeometry( 1.5, 1, 1 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffff00, shininess: 20} ));
+				for (var i = 0; i < 30; i++) {
+					blasted = new THREE.Mesh( new THREE.SphereGeometry( 1.5, 4, 4 ), new THREE.MeshPhongMaterial( { color: (Math.random() * 0xffff00+0xffffff)/2, shininess: 20} ));
 					particles.push(blasted);
 					blasted.position.x = x
 					blasted.position.y = y
 					blasted.position.z = z
 					velocityx.push(Math.random());
-					velocityy.push(Math.random()/2-0.25);
+					velocityy.push(Math.random());
 					velocityz.push(Math.random());
-					lifetimes.push(300-Math.random());
+					lifetimes.push(90-Math.random()*30);
 					firsttime.push(0);
 					scene.add(blasted);
 				}
 			}
 			//===========================================================================================================================================================================
 
-			// for mouse click motions===================================================================================================
-			
-			function onMouseDown() {
-				isMouseDown = true;
-			}
-			function onMouseUp() {
-				isMouseDown = false;
-			}
-			
+			// for mouse click motions===================================================================================================			
 			function onWindowResize() {
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -250,11 +224,6 @@
 				render();
 			}
 			function render() {
-				var delta = clock.getDelta() * 60;
-				/*for (var i = 0; i < fireworks.length; i++) {
-					fireworks[i].position.y += 1;
-					fireworks[i].userData.velocity.y -= (fireworks[i].userData.velocity.y/10);
-				}*/
 				tick();
 
 				controls.update();
