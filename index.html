@@ -47,9 +47,13 @@
 			var velocityx = [];
 			var velocityy = [];
 			var velocityz = [];
-			var materials = [];
 			var lifetimes = [];
-			var fireworks = [];
+/*
+			var blasted = [];
+			var blastedVelx = [];
+			var blastedVely = [];
+			var blastedVelz = [];
+			var blastedLife = [];*/
 
 			
 			init();
@@ -191,7 +195,7 @@
 			var particle;
 			function tick() {
 				if (Math.random() < 0.07) {
-					particle = new THREE.Mesh( new THREE.SphereGeometry( 2, 32, 32 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff} ));
+					particle = new THREE.Mesh( new THREE.SphereGeometry( 2, 32, 32 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffff00, shininess: 100, specularity: 30} ));
 					particle.position.x = Math.random() * 2000 - 1000;
 					particle.position.y = 50;
 					particle.position.z = Math.random() * 2000 - 1000;
@@ -204,7 +208,7 @@
 				}
 				for (var i = 0; i < particles.length; i++) {
 					if (lifetimes[i] <= 0) {
-						//blast(particles[i].position.x, particles[i].position.y, particles[i].position.z);
+						blast(particles[i].position.x, particles[i].position.y, particles[i].position.z);
 						scene.remove(particles[i]);
 						particles.splice(i, 1);
 						velocityx.splice(i, 1);
@@ -224,20 +228,20 @@
 			//===================================================================================================================================================================================
 			var blasted
 			//blast function=====================================================================================================================================================================
-			/*function blast(x, y, z) {
+			function blast(x, y, z) {
 				for (var i = 0; i < 3; i++) {
-					blasted = new THREE.Mesh( new THREE.SphereGeometry( 1, 1, 1 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff} ));
+					blasted = new THREE.Mesh( new THREE.SphereGeometry( 1, 1, 1 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffff00} ));
 					particles.push(blasted);
-					particle.position.x = x
-					particle.position.y = y
-					particle.position.z = z
+					blasted.position.x = x
+					blasted.position.y = y
+					blasted.position.z = z
 					velocityx.push(Math.random()/2-0.25);
 					velocityy.push(Math.random()/2-0.25);
 					velocityz.push(Math.random()/2-0.25);
 					lifetimes.push(70-Math.random());
 					scene.add(blasted);
 				}
-			}*/
+			}
 			//===========================================================================================================================================================================
 
 			// for mouse click motions===================================================================================================
