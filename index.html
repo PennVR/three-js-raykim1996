@@ -66,7 +66,7 @@
 				container.appendChild( info );
 				scene = new THREE.Scene();
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10000 );
-				camera.position.set(39, 300, 10);
+				camera.position.set(39, 200, 10);
 				scene.add( camera );
 
 				// creating terrain=================================================================================================================
@@ -98,6 +98,7 @@
 
 				terrain = new THREE.Mesh(planegeometry, planematerial);
 				terrain.position.x = 20;
+				terrain.position.x -= 100;
 				scene.add(terrain);
 
 				var light = new THREE.PointLight(  0xffffff, 1.4 );
