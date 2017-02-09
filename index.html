@@ -39,7 +39,7 @@
 			var room;
 			var p = [];
 			for (var j = 0; j < 1000; j++) {
-				p.push(new THREE.Vector2(Math.random()*80, Math.random()*80));
+				p.push(new THREE.Vector2(Math.random()*100, Math.random()*100));
 			}
 			var particle;
 			var blasted;
@@ -70,7 +70,7 @@
 				scene.add( camera );
 
 				// creating terrain=================================================================================================================
-				planegeometry = new THREE.PlaneGeometry(2000, 2000, 72, 72);
+				planegeometry = new THREE.PlaneGeometry(2000, 2000, 64, 64);
 				planegeometry.rotateX( - Math.PI / 2 );
 
 				var planematerial = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: false, vertexColors: THREE.VertexColors} );
