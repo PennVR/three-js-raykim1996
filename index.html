@@ -48,12 +48,7 @@
 			var velocityy = [];
 			var velocityz = [];
 			var lifetimes = [];
-/*
-			var blasted = [];
-			var blastedVelx = [];
-			var blastedVely = [];
-			var blastedVelz = [];
-			var blastedLife = [];*/
+			var firsttime = [];
 
 			
 			init();
@@ -72,7 +67,7 @@
 				container.appendChild( info );
 				scene = new THREE.Scene();
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10000 );
-				camera.position.set(39, 100, 10);
+				camera.position.set(39, 200, 10);
 				scene.add( camera );
 				crosshair = new THREE.Mesh(
 					new THREE.RingGeometry( 0.02, 0.04, 32 ),
@@ -90,15 +85,14 @@
 				planegeometry.rotateX( - Math.PI / 2 );
 
 				var planematerial = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: false, vertexColors: THREE.VertexColors} );
-				planematerial.vertexColors = THREE.VertexColors;
 				
 				var color;
 				for ( var i = 0; i < planegeometry.vertices.length; i++) {
 					planegeometry.vertices[i].y = perlinNoise(planegeometry.vertices[i].x, planegeometry.vertices[i].z);
 					color = new THREE.Color( 0xff0000 );
-					color.r = planegeometry.vertices[i].y/50;
-					color.g = 72/255;
-					color.g = 100/255;
+					color.r = 100/255;
+					color.g = planegeometry.vertices[i].y/70;
+					color.b = 72/255;
     				planegeometry.colors[i] = color;
 				}
 				
@@ -117,19 +111,7 @@
 				terrain.position.x = 20;
 				scene.add(terrain);
 				var geometry = new THREE.SphereGeometry( 3, 32, 32 );
-				/*for ( var i = 0; i < 200; i ++ ) {
-					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff} ) );
-					object.position.x = Math.random() * 2000 - 1000;
-					object.position.y = Math.random() * 100 - 2;
-					object.position.z = -Math.random() * 2000 + 1000;
 
-					object.userData.velocity = new THREE.Vector3();
-					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
-					fireworks.push(object);
-					scene.add( object );
-				}*/
-				//========================================================================================================================================
-				
 				var light = new THREE.PointLight(  0xffffff, 1.4 );
 				light.position.set( 50, 150, -50 );
 				scene.add( light );
@@ -195,7 +177,7 @@
 			var particle;
 			function tick() {
 				if (Math.random() < 0.07) {
-					particle = new THREE.Mesh( new THREE.SphereGeometry( 2, 32, 32 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffff00, shininess: 100, specularity: 30} ));
+					particle = new THREE.Mesh( new THREE.SphereGeometry( 2, 16, 16 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffff00, shininess: 100} ));
 					particle.position.x = Math.random() * 2000 - 1000;
 					particle.position.y = 50;
 					particle.position.z = Math.random() * 2000 - 1000;
@@ -204,17 +186,21 @@
 					velocityy.push(7 - Math.random()/5);
 					velocityz.push(0);
 					lifetimes.push(160-Math.random());
+					firsttime.push(1);
 					scene.add(particle);
 				}
 				for (var i = 0; i < particles.length; i++) {
 					if (lifetimes[i] <= 0) {
-						blast(particles[i].position.x, particles[i].position.y, particles[i].position.z);
+						if (firsttime[i] == 1) {
+							blast(particles[i].position.x, particles[i].position.y, particles[i].position.z);
+						}
 						scene.remove(particles[i]);
 						particles.splice(i, 1);
 						velocityx.splice(i, 1);
 						velocityy.splice(i, 1);
 						velocityz.splice(i, 1);
 						lifetimes.splice(i, 1);
+						firsttime.splice(i, 1);
 					} else {
 						particles[i].position.x += velocityx[i];
 						particles[i].position.y += velocityy[i];
@@ -229,16 +215,17 @@
 			var blasted
 			//blast function=====================================================================================================================================================================
 			function blast(x, y, z) {
-				for (var i = 0; i < 3; i++) {
-					blasted = new THREE.Mesh( new THREE.SphereGeometry( 1, 1, 1 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffff00} ));
+				for (var i = 0; i < 10; i++) {
+					blasted = new THREE.Mesh( new THREE.SphereGeometry( 1.5, 1, 1 ), new THREE.MeshPhongMaterial( { color: Math.random() * 0xffff00, shininess: 20} ));
 					particles.push(blasted);
 					blasted.position.x = x
 					blasted.position.y = y
 					blasted.position.z = z
-					velocityx.push(Math.random()/2-0.25);
+					velocityx.push(Math.random());
 					velocityy.push(Math.random()/2-0.25);
-					velocityz.push(Math.random()/2-0.25);
-					lifetimes.push(70-Math.random());
+					velocityz.push(Math.random());
+					lifetimes.push(300-Math.random());
+					firsttime.push(0);
 					scene.add(blasted);
 				}
 			}
